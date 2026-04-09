@@ -1,0 +1,393 @@
+/* ============================================
+   プチプチASMR - Style
+   カテゴリ: ゲーム/感覚系（DESIGN.md参照）
+   ============================================ */
+
+:root {
+  /* DESIGN.md brand colors */
+  --color-primary:        #6C63FF;
+  --color-secondary:      #FBA32A;
+  --color-accent:         #00D4AA;
+  --color-dark:           #1A1A2E;
+  --color-light:          #F8F9FF;
+  --color-text-primary:   #2D2D2D;
+  --color-text-secondary: #888888;
+
+  /* spacing (8px grid) */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* font */
+  --font-sans: 'Noto Sans JP', sans-serif;
+
+  /* bubble palette — プラスチック感 */
+  --bubble-bg:       rgba(200, 230, 255, 0.55);
+  --bubble-border:   rgba(180, 220, 255, 0.8);
+  --bubble-shine:    rgba(255, 255, 255, 0.85);
+  --bubble-shadow:   rgba(100, 150, 200, 0.4);
+  --bubble-popped:   rgba(160, 180, 200, 0.25);
+  --sheet-bg:        rgba(215, 235, 255, 0.30);
+  --sheet-border:    rgba(180, 210, 240, 0.5);
+}
+
+/* ---------- Reset ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden; /* シート以外はスクロール不要 */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: linear-gradient(135deg, #d0e8ff 0%, #e8d0ff 50%, #d0ffe8 100%);
+  background-attachment: fixed;
+  color: var(--color-text-primary);
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ---------- Header ---------- */
+.app-header {
+  flex-shrink: 0;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.header-inner {
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.app-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.counter-area {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.counter-label {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.counter-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+  min-width: 2ch;
+  text-align: right;
+  transition: transform 0.1s ease;
+}
+
+.counter-value.bump {
+  transform: scale(1.4);
+}
+
+.counter-total {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+/* ---------- Main ---------- */
+.main-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---------- Sheet ---------- */
+.sheet-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.puchi-sheet {
+  display: grid;
+  /* 列数はJSで動的にセット */
+  gap: 6px;
+  padding: 12px;
+  background: var(--sheet-bg);
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 16px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    0 4px 24px rgba(100, 150, 220, 0.15),
+    inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+/* ---------- Bubble ---------- */
+.bubble {
+  position: relative;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 35%,
+    var(--bubble-shine) 0%,
+    var(--bubble-bg)    40%,
+    rgba(160, 200, 240, 0.5) 100%
+  );
+  border: 1.5px solid var(--bubble-border);
+  box-shadow:
+    0 3px 8px var(--bubble-shadow),
+    inset 0 -2px 4px rgba(100, 150, 200, 0.3),
+    inset 0 2px 6px rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
+  aspect-ratio: 1;
+  touch-action: manipulation;
+  /* 最低タッチターゲット保証はJSでサイズを制御 */
+}
+
+.bubble::before {
+  /* 光沢ハイライト */
+  content: '';
+  position: absolute;
+  top: 14%;
+  left: 20%;
+  width: 38%;
+  height: 28%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.bubble:hover:not(.popped) {
+  transform: scale(1.08);
+  box-shadow:
+    0 6px 14px var(--bubble-shadow),
+    inset 0 -2px 4px rgba(100, 150, 200, 0.3),
+    inset 0 2px 6px rgba(255, 255, 255, 0.7);
+}
+
+/* ---------- Pop animation ---------- */
+@keyframes popBounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(0.55); }
+  55%  { transform: scale(0.72); }
+  75%  { transform: scale(0.62); }
+  90%  { transform: scale(0.67); }
+  100% { transform: scale(0.65); }
+}
+
+@keyframes ripple {
+  0%   { transform: scale(0.5); opacity: 0.6; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.bubble.popping {
+  animation: popBounce 0.18s ease forwards;
+  pointer-events: none;
+}
+
+.bubble.popped {
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--bubble-popped) 0%,
+    rgba(180, 200, 220, 0.12) 100%
+  );
+  border-color: rgba(160, 180, 200, 0.3);
+  box-shadow:
+    inset 0 2px 6px rgba(100, 130, 160, 0.25),
+    inset 0 -1px 3px rgba(255,255,255,0.1);
+  transform: scale(0.65);
+  cursor: default;
+  pointer-events: none;
+}
+
+.bubble.popped::before {
+  display: none;
+}
+
+/* リップルエフェクト */
+.ripple-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(108, 99, 255, 0.5);
+  pointer-events: none;
+  animation: ripple 0.35s ease-out forwards;
+}
+
+/* ---------- Complete overlay ---------- */
+.complete-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(108, 99, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 10;
+}
+
+.complete-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@keyframes cardPop {
+  0%   { transform: scale(0.7); opacity: 0; }
+  70%  { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.complete-card {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 24px;
+  padding: var(--space-2xl) var(--space-xl);
+  text-align: center;
+  box-shadow:
+    0 20px 60px rgba(108, 99, 255, 0.25),
+    0 4px 16px rgba(0,0,0,0.08);
+  max-width: 280px;
+  width: 90%;
+  animation: cardPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.complete-emoji {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: var(--space-md);
+  display: block;
+}
+
+.complete-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-sm);
+}
+
+.complete-sub {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+  margin-bottom: var(--space-xl);
+}
+
+/* ---------- Reset Button ---------- */
+.btn-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 var(--space-xl);
+  border-radius: 100px;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(108, 99, 255, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  min-width: 44px;
+}
+
+.btn-reset:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(108, 99, 255, 0.5);
+}
+
+.btn-reset:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ---------- Footer ---------- */
+.app-footer {
+  flex-shrink: 0;
+  text-align: center;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255,255,255,0.3);
+  border-top: 1px solid rgba(255,255,255,0.5);
+}
+
+.footer-link {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: var(--color-primary);
+}
+
+/* ---------- Particle burst ---------- */
+@keyframes particle {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0.9; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: particle 0.4s ease-out forwards;
+}
+
+/* ---------- Responsive ---------- */
+@media (min-width: 480px) {
+  .app-title {
+    font-size: 20px;
+  }
+}
+
+/* 縦長スマホで上下余白を最小化 */
+@media (max-height: 600px) {
+  .app-header {
+    padding: var(--space-xs) var(--space-md);
+  }
+  .app-footer {
+    padding: var(--space-xs) var(--space-md);
+  }
+}
