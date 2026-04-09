@@ -46,6 +46,10 @@
   let lightX = 0.35;  // 0〜1 正規化座標
   let lightY = 0.25;
 
+  // canvas/ctxをここで初期化（イベントリスナー設定より前に必要）
+  canvas = document.getElementById('puchiCanvas');
+  ctx    = canvas.getContext('2d');
+
   /* ======================================================
      Bubble クラス
   ====================================================== */
@@ -770,10 +774,10 @@
   /* ======================================================
      初期化
   ====================================================== */
-  canvas = document.getElementById('puchiCanvas');
-  ctx    = canvas.getContext('2d');
-
-  buildSheet();
-  renderFull();  // メインレンダリングループ開始
+  // DOMレイアウト確定後に初期化（clientHeight=0を防ぐ）
+  requestAnimationFrame(() => {
+    buildSheet();
+    renderFull();
+  });
 
 })();
