@@ -4,22 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>プチプチASMR | 無限につぶせる癒しのプチプチ</title>
-  <meta name="description" content="タップするたびにプチッ。無限につぶせる癒しのプチプチASMRアプリ。全部つぶしてスッキリしよう。">
+  <meta name="description" content="タップするたびにプチッ。無限につぶせる癒しのプチプチASMRアプリ。リアルなプラスチック質感とWebGLで作った本物の泡。">
 
   <!-- OGP -->
   <meta property="og:title" content="プチプチASMR | 無限につぶせる癒しのプチプチ">
-  <meta property="og:description" content="タップするたびにプチッ。無限につぶせる癒しのプチプチASMRアプリ。">
+  <meta property="og:description" content="タップするたびにプチッ。リアルなプラスチック質感で癒しのプチプチ体験。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://techio-code.github.io/puchipuchi-asmr/">
   <meta property="og:image" content="https://techio-code.github.io/puchipuchi-asmr/ogp.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="プチプチASMR | 無限につぶせる癒しのプチプチ">
-  <meta name="twitter:description" content="タップするたびにプチッ。無限につぶせる癒しのプチプチASMRアプリ。">
+  <meta name="twitter:description" content="タップするたびにプチッ。リアルなプラスチック質感で癒しのプチプチ体験。">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- GSAP CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -37,16 +40,13 @@
     </div>
   </header>
 
-  <!-- メインエリア -->
-  <main class="main-area">
-    <!-- プチプチシート -->
-    <div class="sheet-wrapper">
-      <div class="puchi-sheet" id="puchiSheet" role="grid" aria-label="プチプチシート"></div>
-    </div>
+  <!-- メインエリア：キャンバスがここに描画される -->
+  <main class="main-area" id="mainArea">
+    <canvas id="puchiCanvas"></canvas>
 
     <!-- 完了オーバーレイ -->
     <div class="complete-overlay" id="completeOverlay" aria-hidden="true">
-      <div class="complete-card">
+      <div class="complete-card" id="completeCard">
         <div class="complete-emoji">✨</div>
         <h2 class="complete-title">全部つぶした！</h2>
         <p class="complete-sub">スッキリした？<br>もう1枚いかが？</p>
