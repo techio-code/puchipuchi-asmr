@@ -496,37 +496,102 @@
   ====================================================== */
   const particles = [];
 
+  // ポップ時パーティクル（白〜ピンク系、放射状10〜15個）
   function spawnMicroBubbles(bubble) {
-    const count = 5 + Math.floor(Math.random() * 4);
+    const count = 10 + Math.floor(Math.random() * 6);  // 10〜15個
     for (let i = 0; i < count; i++) {
-      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.8 - 0.4;
-      const speed = (30 + Math.random() * 40);
-      const size  = 2 + Math.random() * 5;
-      const col   = BUBBLE_COLORS[bubble.colorIndex];
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5 - 0.25;
+      const speed = (40 + Math.random() * 60);
+      const size  = 2 + Math.random() * 6;
+
+      // 白〜ピンク系パーティクル
+      const hue = 300 + Math.random() * 60;   // 300〜360: マゼンタ〜ピンク〜白
+      const sat = 40 + Math.random() * 40;
+      const lit = 80 + Math.random() * 15;
+
       const p = {
         x:    bubble.x,
         y:    bubble.y,
         vx:   Math.cos(angle) * speed,
-        vy:   Math.sin(angle) * speed - 15,  // 少し上向き
+        vy:   Math.sin(angle) * speed - 20,  // 少し上向き
         size,
-        alpha: 0.85,
-        color: `hsla(${col.h}, ${col.s}%, ${col.l + 10}%, 1)`,
+        alpha: 0.92,
+        color: `hsla(${hue}, ${sat}%, ${lit}%, 1)`,
         life:  1,
+        isClick: true,  // クリックエフェクト識別用
       };
       particles.push(p);
 
       // GSAPでライフサイクル管理
       gsap.to(p, {
-        x:     p.x + Math.cos(angle) * speed * 0.4,
-        y:     p.y + Math.sin(angle) * speed * 0.4 + 20,
+        x:     p.x + Math.cos(angle) * speed * 0.45,
+        y:     p.y + Math.sin(angle) * speed * 0.45 + 25,
         alpha: 0,
-        size:  size * 0.3,
+        size:  size * 0.2,
         life:  0,
-        duration: 0.35 + Math.random() * 0.2,
+        duration: 0.4 + Math.random() * 0.25,
         ease: 'power2.out',
         onComplete: () => {
           const idx = particles.indexOf(p);
           if (idx !== -1) particles.splice(idx, 1);
+        }
+      });
+    }
+  }
+
+  // 起動時のウェルカムパーティクル（画面全体に白〜ピンク系が広がる）
+  function spawnLaunchParticles() {
+    const W = canvas.width;
+    const H = canvas.height;
+    const count = 40;
+
+    for (let i = 0; i < count; i++) {
+      // 画面の中央から放射状に
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+      const speed = 60 + Math.random() * 120;
+      const size  = 3 + Math.random() * 8;
+      const delay = Math.random() * 0.3;
+
+      const hue = 280 + Math.random() * 80;   // 280〜360: 紫〜ピンク
+      const sat = 50 + Math.random() * 40;
+      const lit = 75 + Math.random() * 20;
+
+      const p = {
+        x:    W / 2 + (Math.random() - 0.5) * W * 0.3,
+        y:    H / 2 + (Math.random() - 0.5) * H * 0.3,
+        vx:   0,
+        vy:   0,
+        size,
+        alpha: 0,
+        color: `hsla(${hue}, ${sat}%, ${lit}%, 1)`,
+        life:  0,
+        isLaunch: true,
+      };
+      particles.push(p);
+
+      gsap.to(p, {
+        x:     p.x + Math.cos(angle) * speed * 0.6,
+        y:     p.y + Math.sin(angle) * speed * 0.6,
+        alpha: 0.9,
+        size:  size * 0.4,
+        life:  1,
+        duration: 0.2,
+        delay,
+        ease: 'power2.out',
+        onComplete: () => {
+          gsap.to(p, {
+            x:     p.x + Math.cos(angle) * speed * 0.4,
+            y:     p.y + Math.sin(angle) * speed * 0.4 + 30,
+            alpha: 0,
+            size:  size * 0.1,
+            life:  0,
+            duration: 0.5 + Math.random() * 0.3,
+            ease: 'power2.in',
+            onComplete: () => {
+              const idx = particles.indexOf(p);
+              if (idx !== -1) particles.splice(idx, 1);
+            }
+          });
         }
       });
     }
@@ -540,12 +605,28 @@
       ctx.globalAlpha = p.alpha;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      // 小さな泡のグラデーション
-      const pg = ctx.createRadialGradient(p.x - p.size * 0.3, p.y - p.size * 0.3, 0, p.x, p.y, p.size);
-      pg.addColorStop(0, 'rgba(255,255,255,0.9)');
-      pg.addColorStop(0.4, p.color);
-      pg.addColorStop(1, 'rgba(160,190,220,0.3)');
-      ctx.fillStyle = pg;
+
+      if (p.isClick || p.isLaunch) {
+        // 白〜ピンク系パーティクル：グロウ付きラジアルグラデーション
+        const glowSize = p.size * 2.5;
+        const pg = ctx.createRadialGradient(
+          p.x - p.size * 0.25, p.y - p.size * 0.25, 0,
+          p.x, p.y, glowSize
+        );
+        pg.addColorStop(0,   'rgba(255,255,255,0.95)');
+        pg.addColorStop(0.25, p.color);
+        pg.addColorStop(0.6,  p.color.replace('1)', '0.4)'));
+        pg.addColorStop(1,   'rgba(255,200,230,0)');
+        ctx.arc(p.x, p.y, glowSize, 0, Math.PI * 2);
+        ctx.fillStyle = pg;
+      } else {
+        // 既存の青系泡パーティクル
+        const pg = ctx.createRadialGradient(p.x - p.size * 0.3, p.y - p.size * 0.3, 0, p.x, p.y, p.size);
+        pg.addColorStop(0, 'rgba(255,255,255,0.9)');
+        pg.addColorStop(0.4, p.color);
+        pg.addColorStop(1, 'rgba(160,190,220,0.3)');
+        ctx.fillStyle = pg;
+      }
       ctx.fill();
       ctx.restore();
     }
@@ -778,6 +859,8 @@
   setTimeout(() => {
     buildSheet();
     renderFull();
+    // 起動時ウェルカムパーティクル（少し遅らせてシートが描画されてから発火）
+    setTimeout(() => spawnLaunchParticles(), 150);
   }, 0);
 
 })();
